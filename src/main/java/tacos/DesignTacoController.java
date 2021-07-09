@@ -52,17 +52,12 @@ public class DesignTacoController {
         return "design";
     }
 
-//    @PostMapping
-//    public String processDesign (Design desing){
-//        //TODO
-//        log.info("Processing desing "+desing );
-//        return "redirect:/orders/current";
-//    }
-
 
     //tag::processDesignValidated[]
     @PostMapping
-    public String processDesign(@Valid /*@ModelAttribute("design")*/ Taco design, Errors errors, Model model) {
+
+    public String processDesign(@Valid @ModelAttribute("design") Taco design,  Errors errors, Model model) {
+        System.out.println("Errors: "+errors.hasErrors());
         if (errors.hasErrors()) {
             return "design";
         }
