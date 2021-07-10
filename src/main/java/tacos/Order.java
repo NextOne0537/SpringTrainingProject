@@ -22,7 +22,7 @@ public class Order {
     private String zip;
     @NotBlank (message = "Credit card number is required")
     private String ccNumber;
-    @Pattern (regexp="^(0[1-9]|1[0-2])([\\/])([1-9][0-9])$",message = "Expiration date required")
+    @Pattern (regexp="^(0[1-9]|1[0-2])([\\/])([1-9][0-9])$",message = "Expiration date is required in format mm/yy")
     private String ccExpiration;
     @NotBlank (message = "CVV cannot be blank")
     private String ccCVV;
