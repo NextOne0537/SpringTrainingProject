@@ -6,9 +6,14 @@ import javax.validation.constraints.Pattern;
 
 import lombok.Data;
 
+import java.sql.Date;
+
 
 @Data
 public class Order {
+
+    private Long id;
+    private Date createAt;
 
     @NotBlank (message = "Name is required")
     private String name;
