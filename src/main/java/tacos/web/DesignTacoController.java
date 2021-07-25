@@ -29,6 +29,16 @@ public class DesignTacoController {
     private IngredientRepository ingredientRepo;
     private TacoRepository designRepo;
 
+    @ModelAttribute (name = "design")
+    public Taco design(){
+        return new Taco();
+    }
+
+    @ModelAttribute (name = "order")
+    public Order order(){
+        return new Order();
+    }
+
     @Autowired
     public DesignTacoController(IngredientRepository ingredientRepo, TacoRepository designRepo) {
         this.ingredientRepo = ingredientRepo;
@@ -73,33 +83,28 @@ public class DesignTacoController {
         return "design";
     }
 
-    @ModelAttribute (name = "taco")
-    public Taco taco(){
-        return new Taco();
-    }
 
-    @ModelAttribute (name = "order")
-    public Order order(){
-        return new Order();
-    }
 
     //tag::processDesignValidated[]
     @PostMapping
     public String processDesign
-    (@Valid Taco design,  Errors errors, @ModelAttribute Order order, Model model) {
-        System.out.println("Errors: "+errors.hasErrors());
+
+    (@Valid Taco design, Errors errors, @ModelAttribute Order order) {
+
+        System.out.println("Errors: " + errors.hasErrors());
         errors.getAllErrors().forEach(System.out::println);
         System.out.println(errors.getErrorCount()+" - error count");
+
         if (errors.hasErrors()) {
             return "design";
         }
+
         Taco saved = designRepo.save(design);
         order.addDesign(saved);
 
-        model.addAttribute("order", order);
+//        model.addAttribute("order", order);
 
         log.info("Processing design: " + design);
         return "redirect:/orders/current";
     }
-
 }
