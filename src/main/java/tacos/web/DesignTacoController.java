@@ -1,8 +1,8 @@
-package tacos;
+package tacos.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import tacos.Ingredient.*;
+import tacos.Ingredient;
 
 
 import org.springframework.ui.Model;
@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 
 import javax.validation.Valid;
 import org.springframework.validation.Errors;
+import tacos.Order;
+import tacos.Taco;
 import tacos.data.IngredientRepository;
 import tacos.data.TacoRepository;
 
@@ -19,12 +21,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RequestMapping ("/design")
 @Controller
+@RequestMapping ("/design")
 @SessionAttributes("order")
 public class DesignTacoController {
 
-    private final IngredientRepository ingredientRepo;
+    private IngredientRepository ingredientRepo;
     private TacoRepository designRepo;
 
     @Autowired
@@ -33,7 +35,7 @@ public class DesignTacoController {
         this.designRepo = designRepo;
     }
 
-    private List<Ingredient> filterByType(List<Ingredient> ingredients, Type type) {
+    private List<Ingredient> filterByType(List<Ingredient> ingredients, String type) {
 
         return ingredients.stream()
                 .filter(x -> x.getType().equals(type))
@@ -59,9 +61,12 @@ public class DesignTacoController {
         List<Ingredient> ingredients = new ArrayList<>();
         ingredientRepo.findAll().forEach(ingredients::add);
 
-        Type [] types = Ingredient.Type.values();
-        for (Type type : types){
-            model.addAttribute(type.toString().toLowerCase(),
+        List<String>types = new ArrayList<>();
+
+        ingredients.forEach(ingredient -> types.add(ingredient.getType()));
+
+        for (String type : types){
+            model.addAttribute(type.toLowerCase(),
                     filterByType(ingredients, type));
         }
         model.addAttribute("design", new Taco());
@@ -81,19 +86,19 @@ public class DesignTacoController {
     //tag::processDesignValidated[]
     @PostMapping
     public String processDesign
-    (@Valid @ModelAttribute("design") Taco design,  Errors errors, /*Model model*/
-     @ModelAttribute Order order) {
+    (@Valid Taco design,  Errors errors, @ModelAttribute Order order, Model model) {
         System.out.println("Errors: "+errors.hasErrors());
         errors.getAllErrors().forEach(System.out::println);
         System.out.println(errors.getErrorCount()+" - error count");
         if (errors.hasErrors()) {
             return "design";
         }
-
         Taco saved = designRepo.save(design);
         order.addDesign(saved);
-        log.info("Processing design: " + design);
 
+        model.addAttribute("order", order);
+
+        log.info("Processing design: " + design);
         return "redirect:/orders/current";
     }
 
