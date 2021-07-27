@@ -1,3 +1,10 @@
+
+
+/**
+ * this code is from previous chapters of Spring in Action book,
+ * it is required to implement persistence via SimpleJDBC*/
+
+
 //package tacos.data;
 //
 //import org.springframework.beans.factory.annotation.Autowired;
