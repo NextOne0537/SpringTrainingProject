@@ -47,6 +47,9 @@
             <div th:each="ingredient : ${veggies}">
                 <input name="ingredients" type="checkbox" th:value="${ingredient.id}"/>
                 <span th:text="${ingredient.name}">INGREDIENT</span>
+<!--                <span class="validationError" th:if="${#fields.hasErrors('ingredients')}" th:errors="*{ingredients}">-->
+<!--                    INGREDIENTS ERROR-->
+<!--                </span>-->
                 <br/>
             </div>
         </div>
