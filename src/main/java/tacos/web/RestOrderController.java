@@ -10,6 +10,8 @@ import tacos.data.OrderRepository;
 /**
  * @author Timofey
  * @since 25.07.2021
+ *
+ * Primitive REST controller for output testing
  */
 
 @Slf4j

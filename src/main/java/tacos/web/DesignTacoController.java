@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 
 public class DesignTacoController {
 
-    private IngredientRepository ingredientRepo;
-    private TacoRepository designRepo;
+    private final IngredientRepository ingredientRepo;
+    private final TacoRepository designRepo;
 
     @ModelAttribute (name = "design")
     public Taco design(){
