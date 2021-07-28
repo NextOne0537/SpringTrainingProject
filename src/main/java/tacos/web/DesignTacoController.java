@@ -1,22 +1,18 @@
 package tacos.web;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import tacos.Ingredient;
-
-
-import org.springframework.ui.Model;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
-
-import javax.validation.Valid;
-import org.springframework.validation.Errors;
 import tacos.Order;
 import tacos.Taco;
 import tacos.data.IngredientRepository;
 import tacos.data.TacoRepository;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -98,13 +94,11 @@ public class DesignTacoController {
         System.out.println(errors.getErrorCount()+" - error count");
 
         if (errors.hasErrors()) {
-            return "design";
+            return "redirect:/design";
         }
 
         Taco saved = designRepo.save(design);
         order.addDesign(saved);
-
-//        model.addAttribute("order", order);
 
         log.info("Processing design: " + design);
         return "redirect:/orders/current";
