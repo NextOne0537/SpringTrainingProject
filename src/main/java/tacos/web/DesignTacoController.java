@@ -94,7 +94,7 @@ public class DesignTacoController {
         System.out.println(errors.getErrorCount()+" - error count");
 
         if (errors.hasErrors()) {
-            return "redirect:/design";
+            return "design";
         }
 
         Taco saved = designRepo.save(design);

@@ -55,5 +55,7 @@ public class Order implements Serializable {
     @Digits (integer=3, fraction=0,message = "CVV cannot be blank")
     private String ccCVV;
 
+    @ManyToOne
+    private User user;
 
 }

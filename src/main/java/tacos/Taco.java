@@ -1,15 +1,14 @@
 // tag::all[]
 // tag::allButValidation[]
 package tacos;
-import java.util.Date;
-import java.util.List;
-// end::allButValidation[]
+
+import lombok.Data;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-// tag::allButValidation[]
-import lombok.Data;
-import lombok.Generated;
+import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
@@ -19,14 +18,15 @@ public class Taco {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @NotNull
+  @NotNull (message = "Name cannot be empty")
   @Size(min=5, message="Name must be at least 5 characters long")
   private String name;
 
   private Date createdAt;
 
   @ManyToMany(targetEntity = Ingredient.class)
-  @Size(min = 1, message = "You must choose at least 1 ingredient")
+  @NotNull (message = "Choose at least 3 ingredients")
+  @Size(min = 3, message = "You must choose at least 3 ingredients")
   private List<Ingredient> ingredients;
 
   @PrePersist

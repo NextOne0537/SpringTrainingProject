@@ -1,8 +1,7 @@
 package tacos.security;
 
 
-
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -10,8 +9,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
@@ -29,17 +28,53 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
+    @Autowired
+//    DataSource dataSource; - was required for LDAP auth;
+    UserDetailsService userDetailsService;
+
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("timofey")
-                .password(passwordEncoder().encode("marsik"))
-                .authorities("ROLE_USER")
-                .and()
-                .passwordEncoder(passwordEncoder())
-                .withUser("dima")
-                .password(passwordEncoder().encode("marsik"))
-                .authorities("ROLE_USER");
+        auth
+                /** previous, in memory authentication*/
+//                .inMemoryAuthentication()
+//                .withUser("timofey")
+//                .password(passwordEncoder().encode("marsik"))
+//                .authorities("ROLE_USER")
+//                .and()
+//                .passwordEncoder(passwordEncoder())
+//                .withUser("dima")
+//                .password(passwordEncoder().encode("marsik"))
+//                .authorities("ROLE_USER");
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder());
+        /**jdbc authentication*/
+//        auth
+//                .jdbcAuthentication()
+//                .dataSource(dataSource)
+//                .usersByUsernameQuery(
+//                        "select username, password, enabled from Users where username=?")
+//                .authoritiesByUsernameQuery(
+//                        "select username, authority from UserAuthorities where username=?"
+//                );
+
+        // LDAP chapter
+//        auth
+//                .ldapAuthentication()
+//                .userSearchBase("ou=people")
+//                .userSearchFilter("(uid={0})")
+//                .groupSearchBase("ou=groups")
+//                .groupSearchFilter("member={0}")
+//                .passwordCompare()
+//                .passwordEncoder(passwordEncoder())
+//                .passwordAttribute("passcode")
+//                .and()
+//                .contextSource()
+////                .url("ldap://tacocloud.com:389/dc=tacocloud,dc=com")
+//                .root("dc=tacocloud,dc=com")
+//                .ldif("classpath:users.ldif");
+
+
     }
 
     @Override
@@ -47,15 +82,48 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/login", "/", "/static/images/**", "/static/**", "/resources/**").permitAll()
-                .antMatchers("/design", "/orders/**", "/orders/current").authenticated()
-                .anyRequest().authenticated()
+                .antMatchers("/design", "/orders")
+                .access("hasRole('ROLE_USER')")
+                .antMatchers("/","/**")
+                .access("permitAll")
                 .and()
                 .formLogin()
-                .defaultSuccessUrl("/design")
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
                 .and()
                 .logout()
-                .logoutSuccessUrl("/");
+                .logoutSuccessUrl("/")
+                // Allow pages to be loaded in frames from the same origin; needed for H2-Console
+                // tag::frameOptionsSameOrigin[]
+                .and()
+                .headers()
+                .frameOptions()
+                .sameOrigin();
+
+//
+//            http
+//                    .csrf().disable()
+//                    .authorizeRequests()
+//                    .antMatchers("/design", "/orders")
+//                    .hasRole("USER")
+//                    .antMatchers("/", "/**").permitAll();
+
+
+
+//        http
+//                .csrf().disable()
+//                .authorizeRequests()
+//                .antMatchers("/login", "/", "/static/images/**", "/static/**", "/resources/**").permitAll()
+//                .antMatchers("/design", "/orders/**", "/orders/current")
+//                //.authenticated()
+//                .access("hasRole('ROLE_USER')")
+//                .anyRequest().authenticated()
+//                .and()
+//                .formLogin()
+//                .defaultSuccessUrl("/design")
+//                .and()
+//                .logout()
+//                .logoutSuccessUrl("/");
     }
 
     /**This is required for application to load static content
@@ -67,7 +135,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         web
                 .ignoring()
 //                .antMatchers("/resources/**")
-                .antMatchers("/images/**");
+                .antMatchers("/h2-console/**")
+                .antMatchers("/images/**")
+                .antMatchers("/styles/**");
 //                .antMatchers("/static/**")
 
     }
